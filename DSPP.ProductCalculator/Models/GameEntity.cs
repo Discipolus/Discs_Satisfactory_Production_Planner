@@ -10,7 +10,7 @@ namespace DSPP.ProductCalculator.Models
     public abstract class GameEntity
     {
         [JsonPropertyName("ClassName")]
-        public int ClassName { get; set; }
+        public string ClassName { get; set; }
 
         [JsonPropertyName("mDisplayName")]
         public string DisplayName { get; set; }

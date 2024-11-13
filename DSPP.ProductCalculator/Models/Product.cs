@@ -13,6 +13,6 @@ public class Product : GameEntity
 
     
     [JsonIgnore]
-    List<Rezept> RezeptList { get; set; }
+    List<Recipe> RezeptList { get; set; }
 
 }

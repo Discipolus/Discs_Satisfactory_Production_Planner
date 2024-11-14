@@ -1,27 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace DSPP.ProductCalculator.Models.Json;
 
-namespace DSPP.ProductCalculator;
-
-
-public class Rootobject
-{
-    public List<GameEntityGroup> Property1 { get; set; }
-}
-
-public class GameEntityGroup
-{
-    public string NativeClass { get; set; }
-    public List<GameEntity> Classes { get; set; }
-}
-
-public class GameEntity
+public class GameEntity : IComparable, IComparer
 {
     public string ClassName { get; set; }
     public string mDisplayName { get; set; }
+    public string DisplayName { get => mDisplayName; set => mDisplayName = value; }
     public string mDescription { get; set; }
     public string mAbbreviatedDisplayName { get; set; }
     public string mStackSize { get; set; }
@@ -893,40 +876,22 @@ public class GameEntity
     public string mSignToSignOffset { get; set; }
     public string mOnSpaceElevatorStateUpdated { get; set; }
     public string mSpaceElevatorState { get; set; }
-}
 
-public class Munlock
-{
-    public string Class { get; set; }
-    public string mRecipes { get; set; }
-    public string mResourcesToAddToScanner { get; set; }
-    public string mResourcePairsToAddToScanner { get; set; }
-    public string mEmotes { get; set; }
-    public string mSchematics { get; set; }
-    public string mScannableObjects { get; set; }
-    public string mNumInventorySlotsToUnlock { get; set; }
-    public string mCustomizationUnlocks { get; set; }
-    public string mNumArmEquipmentSlotsToUnlock { get; set; }
-    public string mUploadSpeedPercentageDecrease { get; set; }
-    public string mItemStackLimitIncrease { get; set; }
-    public string mNumSlotsToUnlock { get; set; }
-    public string mItemsToGive { get; set; }
-    public string mTapeUnlocks { get; set; }
-}
+    public int CompareTo(object? obj)
+    {
+        return DisplayName.CompareTo(((GameEntity)obj).DisplayName);
+    }
+    public int Compare(object? x, object? y)
+    {
+        if (x.GetType() != typeof(GameEntity) || x.GetType().IsSubclassOf(typeof(GameEntity)))
+        {
+            throw new ArgumentException("Object is not a GameEntity");
+        }
+        return ((GameEntity)x).CompareTo((GameEntity)y);
+    }
 
-public class Mschematicdependency
-{
-    public string Class { get; set; }
-    public string mSchematics { get; set; }
-    public string mRequireAllSchematicsToBePurchased { get; set; }
-    public string mGamePhase { get; set; }
-    public string mOnlyAllowInSelectedPhase { get; set; }
-}
-
-public class Mfuel
-{
-    public string mFuelClass { get; set; }
-    public string mSupplementalResourceClass { get; set; }
-    public string mByproduct { get; set; }
-    public string mByproductAmount { get; set; }
+    public override string ToString()
+    {
+        return DisplayName;
+    }
 }

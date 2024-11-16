@@ -4,9 +4,16 @@ public class GameEntity : IComparable, IComparer
 {
     public string ClassName { get; set; }
     public string mDisplayName { get; set; }
-    public string DisplayName { get => mDisplayName; set => mDisplayName = value; }
-    public string mDescription { get; set; }
-    public string mAbbreviatedDisplayName { get; set; }
+    public string? FullName { get; set; }
+    public string? mDescription { get; set; }
+    public string? mAbbreviatedDisplayName { get; set; }
+    public string? mIngredients { get; set; }
+    public string? mProduct { get; set; }
+    public string? mProducedIn { get; set; }
+    public string? mManufactoringDuration { get; set; }
+
+    /* unused Fields
+
     public string mStackSize { get; set; }
     public string mCanBeDiscarded { get; set; }
     public string mRememberPickUp { get; set; }
@@ -31,7 +38,7 @@ public class GameEntity : IComparable, IComparer
     public string mScannerLightColor { get; set; }
     public string mNeedsPickUpMarker { get; set; }
     public string mResourceSinkPoints { get; set; }
-    public string FullName { get; set; }
+    
     public string mType { get; set; }
     public string mStatisticGameplayTag { get; set; }
     public string mTechTier { get; set; }
@@ -114,12 +121,8 @@ public class GameEntity : IComparable, IComparer
     public string BlendExp { get; set; }
     public string Steps { get; set; }
     public string bigOverlapList { get; set; }
-    public string mIngredients { get; set; }
-    public string mProduct { get; set; }
     public string mManufacturingMenuPriority { get; set; }
-    public string mManufactoringDuration { get; set; }
     public string mManualManufacturingMultiplier { get; set; }
-    public string mProducedIn { get; set; }
     public string mVariablePowerConsumptionConstant { get; set; }
     public string mVariablePowerConsumptionFactor { get; set; }
     public string mSize { get; set; }
@@ -876,10 +879,26 @@ public class GameEntity : IComparable, IComparer
     public string mSignToSignOffset { get; set; }
     public string mOnSpaceElevatorStateUpdated { get; set; }
     public string mSpaceElevatorState { get; set; }
+    */
+
+    public GameEntity()
+    { }
+    public GameEntity(GameEntity gameEntity)
+    {
+        this.ClassName = gameEntity.ClassName;
+        this.mDisplayName = gameEntity.mDisplayName;
+        this.FullName = gameEntity.FullName;
+        this.mDescription = gameEntity.mDescription;
+        this.mAbbreviatedDisplayName = gameEntity.mAbbreviatedDisplayName;
+        this.mIngredients = gameEntity.mIngredients;
+        this.mProduct = gameEntity.mProduct;
+        this.mProducedIn = gameEntity.mProducedIn;
+        this.mManufactoringDuration = gameEntity.mManufactoringDuration;
+    }
 
     public int CompareTo(object? obj)
     {
-        return DisplayName.CompareTo(((GameEntity)obj).DisplayName);
+        return mDisplayName.CompareTo(((GameEntity)obj).mDisplayName);
     }
     public int Compare(object? x, object? y)
     {
@@ -892,6 +911,6 @@ public class GameEntity : IComparable, IComparer
 
     public override string ToString()
     {
-        return DisplayName;
+        return mDisplayName;
     }
 }

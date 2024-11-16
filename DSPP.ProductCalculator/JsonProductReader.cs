@@ -1,32 +1,38 @@
 ﻿namespace DSPP.ProductCalculator;
 public class JsonProductReader
 {
+    private List<GameEntityGroup> gameEntityGroups = new ();
+    private List<Product> allProducts = new ();
+    private List<Recipe> allRecipes = new ();
+    private List<GameEntity> allBuildings = new ();
     public List<Product> DeserializeJson(string jsonPath)
     {
-        List<GameEntityGroup> gameEntityGroups = ReadGameEntitieGroups(jsonPath);
-        List<Product> products = new List<Product>();
-        List<Recipe> recipes = new List<Recipe>();
+        gameEntityGroups = ReadGameEntitieGroups(jsonPath);        
 
         foreach (GameEntityGroup gameEntityGroup in gameEntityGroups)
         {
             if (gameEntityGroup.NativeClass.Contains("FGItemDescriptor") || gameEntityGroup.NativeClass.Contains("FGResourceDescriptor"))
             {
-                ReadAllProducts(gameEntityGroup, products);                
+                allProducts.AddRange(ConvertGameEntityListToProductList(gameEntityGroup));
+            }
+            if (gameEntityGroup.NativeClass.Contains("FGBuildableManufacturer"))
+            {
+                allBuildings.AddRange(gameEntityGroup.Classes);
             }
         }
         foreach (GameEntityGroup gameEntityGroup in gameEntityGroups)
         {
             if (gameEntityGroup.NativeClass.Contains("FGRecipe"))
             {
-                recipes = ReadAllRecipes(gameEntityGroup, products);
+                allRecipes = ReadAllRecipes(gameEntityGroup, allProducts);
                 break;
             }
         }
-        AddRecipesToProducts(products, recipes);
-        
-        products.Sort();
+        AddRecipesToProducts(allProducts, allRecipes);
 
-        return products;
+        allProducts.Sort();
+
+        return allProducts;
     }
 
     private void AddRecipesToProducts(List<Product> products, List<Recipe> recipes)
@@ -37,28 +43,25 @@ public class JsonProductReader
         }
     }
 
-    private List<GameEntityGroup> ReadGameEntitieGroups(string json)
+    private List<GameEntityGroup>? ReadGameEntitieGroups(string json)
     {
         StreamReader sr = new StreamReader(json);
         return JsonSerializer.Deserialize<List<GameEntityGroup>>(sr.ReadToEnd());
     }
 
-    private List<Product> ReadAllProducts(GameEntityGroup gameEntityGroup, List<Product> products)
+    private List<Product> ConvertGameEntityListToProductList(GameEntityGroup gameEntityGroup)
     {
+        List<Product> products = new();
         foreach (GameEntity gameEntity in gameEntityGroup.Classes)
         {
-            products.Add(new Product()
-            {
-                ClassName = gameEntity.ClassName,
-                DisplayName = gameEntity.mDisplayName
-            });
+            products.Add(new Product(gameEntity));
         }
         return products;
     }
 
     private List<Recipe> ReadAllRecipes(GameEntityGroup gameEntityGroup, List<Product> products)
     {
-        List<Recipe> recipes = new List<Recipe>();
+        List<Recipe> recipes = new();
 
         foreach (GameEntity gameEntity in gameEntityGroup.Classes)
         {
@@ -66,8 +69,7 @@ public class JsonProductReader
             {
                 ClassName = gameEntity.ClassName,
                 FullName = gameEntity.FullName,
-                DisplayName = gameEntity.mDisplayName,
-                Produktionszeit = Convert.ToDouble(gameEntity.mManufactoringDuration)
+                mDisplayName = gameEntity.mDisplayName
             };
             SortedList<Product, double> recipeProducts = ParseProductsFromString(gameEntity.mProduct, products);
             if (recipeProducts.Count == 0)
@@ -97,7 +99,7 @@ public class JsonProductReader
     private SortedList<Product, double> ParseProductsFromString(string jsonProductArray, List<Product> products)
     {
         SortedList<Product, double> sortedList = new();
-        string[] productsAndAmounts = jsonProductArray.Split('(', ')').Where(x=> !string.IsNullOrWhiteSpace(x)).ToArray();
+        string[] productsAndAmounts = jsonProductArray.Split('(', ')').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
 
         foreach (string productAndAmount in productsAndAmounts)
         {
@@ -109,11 +111,33 @@ public class JsonProductReader
             double amount = double.Parse(productAndAmount.Split("Amount=")[1]);
             sortedList.Add(product, amount);
         }
-        
-        return sortedList;        
+
+        return sortedList;
     }
-    private Buildings GetGebaeudetyp(string jsonGebaeudetyp)
+    private Buildings GetGebaeudetyp(string mProducedIn)
     {
-        return Buildings.Schmelzofen;
+        string[] productionEntities = mProducedIn.Split('(', ',', ')').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+        GameEntity? building = new();
+        foreach (string entity in productionEntities)
+        {
+            building = allBuildings.FirstOrDefault(x => entity.Contains(x.ClassName));
+            if (building != null)
+            {
+                break;
+            }
+        }
+        if (building == null)
+        {
+            return Buildings.None;
+        }
+
+        if (Enum.TryParse(building.mDisplayName, out Buildings buildingType))
+        {
+            return buildingType;
+        }
+        else
+        {
+            return Buildings.None;
+        }
     }
 }

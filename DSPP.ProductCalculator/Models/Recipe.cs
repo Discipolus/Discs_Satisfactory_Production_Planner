@@ -2,32 +2,20 @@
 
 public class Recipe: GameEntity
 {
-    [JsonPropertyName("mFullName")]
-    public string FullName { get; set; }
+    public SortedList<Product, double> Educts { get; set; } = new();
 
-    [JsonPropertyName("mIngredients")]
-    public SortedList<Product, double> Educts { get; set; }
+    public SortedList<Product, double> Products { get; set; } = new();
 
-    [JsonPropertyName("mProduct")]
-    public SortedList<Product, double> Products { get; set; }
-
-    [JsonPropertyName("mProducedIn")]
     public Buildings BuildingType { get; set; }
 
-    [JsonPropertyName("mManufactoringDuration")]
-    public double Produktionszeit { get; set; }
+    public double Produktionszeit { get => Convert.ToDouble(mManufactoringDuration); set => mManufactoringDuration = value.ToString(); }
 
-	public Recipe Clone()
+    public Recipe(){}
+    public Recipe(GameEntity gameEntity) : base(gameEntity){}
+
+    public Recipe Clone()
 	{
-		return new Recipe()
-		{
-			ClassName = this.ClassName,
-			FullName = this.FullName,
-			Educts = new SortedList<Product, double>(this.Educts),
-			Products = new SortedList<Product, double>(this.Products),
-			BuildingType = this.BuildingType,
-			Produktionszeit = this.Produktionszeit
-		};
+		return new Recipe((GameEntity) this);
 	}
 
 }

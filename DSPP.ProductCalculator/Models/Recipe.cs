@@ -10,6 +10,8 @@ public class Recipe: GameEntity
 
     public double Produktionszeit { get => Convert.ToDouble(mManufactoringDuration); set => mManufactoringDuration = value.ToString(); }
 
+    public bool isDefault { get => !ClassName.Contains("Alternate"); }
+
     public Recipe(){}
     public Recipe(GameEntity gameEntity) : base(gameEntity){}
 

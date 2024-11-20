@@ -909,6 +909,18 @@ public class GameEntity : IComparable, IComparer
         return ((GameEntity)x).CompareTo((GameEntity)y);
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj == null) {
+            return false;
+        }
+        if (obj.GetType() != typeof(GameEntity) || obj.GetType().IsSubclassOf(typeof(GameEntity)))
+        {
+            throw new ArgumentException("Object is not a GameEntity");
+        }
+        return mDisplayName.Equals(((GameEntity)obj).mDisplayName);
+    }
+
     public override string ToString()
     {
         return mDisplayName;

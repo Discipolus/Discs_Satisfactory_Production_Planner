@@ -65,12 +65,7 @@ public class JsonProductReader
 
         foreach (GameEntity gameEntity in gameEntityGroup.Classes)
         {
-            Recipe recipe = new Recipe()
-            {
-                ClassName = gameEntity.ClassName,
-                FullName = gameEntity.FullName,
-                mDisplayName = gameEntity.mDisplayName
-            };
+            Recipe recipe = new Recipe(gameEntity);
             SortedList<Product, double> recipeProducts = ParseProductsFromString(gameEntity.mProduct, products);
             if (recipeProducts.Count == 0)
             {
